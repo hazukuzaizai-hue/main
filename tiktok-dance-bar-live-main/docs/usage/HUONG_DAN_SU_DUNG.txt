@@ -1,0 +1,26 @@
+HUONG DAN TIKTOK LIVE STUDIO
+
+KHOI DONG
+Chay run.bat o thu muc goc. Bridge mac dinh dung http://127.0.0.1:3000.
+Neu trinh duyet chua mo, vao http://127.0.0.1:3000/control.html.
+Bam Mo game o goc tren ben phai de mo cua so game.
+Tab Ket noi LIVE: bat LIVE tren TikTok, nhap username dang phat roi bam Ket noi.
+De dung TikFinity du phong, dat LIVE_PROVIDER=tikfinity trong TikTokBridge/.env
+va khoi dong lai Bridge.
+
+CAC TAB
+- Assets gom cac muc sau:
+  - Nhan vat, Canh, Bang hieu: them asset va bam Test de thu trong game.
+    Nhan vat ho tro GIF/WebP dong, PNG va JPG.
+  - Am nhac: tai MP3/WAV/OGG, chon Phat trong game va chinh am luong.
+  - Video man DJ: chon song nhac LED, video MP4 hoac tat man DJ.
+  - Phong nen: chon san khau 3D hoac anh nen tai len.
+- Cai dat tuong tac: dieu kien tham gia, luat chat/gift va hieu ung.
+- Kiem thu / Su kien: demo, gift va hanh dong mau.
+- Thong ke phien: xem thong ke va reset.
+
+DU LIEU VA SAO LUU
+Du lieu nguoi dung nam trong Data; khong dat nhac/video vao Build.
+Sao luu ca thu muc Data khi chuyen may hoac thay ban build.
+MediaSources chua GIF va video nguon. UnityProject/Assets/Resources chua asset Unity da dong goi.
+Xem docs/PROJECT_STRUCTURE.md de biet duong dan va cach build.

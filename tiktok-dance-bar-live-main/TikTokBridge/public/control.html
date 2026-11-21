@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TikTok Live</title>
+        <link rel="icon" type="image/webp" href="/ai-ngo-logo.webp" />
+        <link rel="apple-touch-icon" href="/ai-ngo-logo.webp" />
+        <link rel="stylesheet" href="control.css?v=gift-test-count" />
+    </head>
+    <body>
+        <!-- ═══════════ NAVBAR ═══════════ -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <img src="/ai-ngo-logo.webp" alt="" />
+                <div class="navbar-brand-text">
+                    TikTok Live<span>AI NGƠ</span>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="status-pill" id="live-badge">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="status-title">Đang kết nối</span>
+                </div>
+                <button id="open-game" class="btn btn-secondary" type="button">
+                    Mở game ↗
+                </button>
+                <span
+                    id="open-game-message"
+                    role="status"
+                    aria-live="polite"
+                ></span>
+            </div>
+        </nav>
+
+        <aside class="sidebar" aria-label="Điều hướng cài đặt">
+            <p class="sidebar-label">ĐIỀU KHIỂN</p>
+            <div
+                class="tab-nav"
+                role="tablist"
+                aria-label="Cài đặt LIVE"
+                aria-orientation="vertical"
+            >
+                <button
+                    class="tab-btn active"
+                    data-tab="live"
+                    id="nav-live"
+                    role="tab"
+                    aria-controls="tab-live"
+                    aria-selected="true"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M12 3v5m-4-5v5m-3 0h14v3a7 7 0 0 1-7 7v4m-7-14v3a7 7 0 0 0 7 7"
+                        /></svg
+                    ><span>Kết nối LIVE</span></button
+                ><button
+                    class="tab-btn"
+                    data-tab="assets"
+                    id="nav-assets"
+                    role="tab"
+                    aria-controls="tab-assets"
+                    aria-selected="false"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                    >
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" /></svg
+                    ><span>Assets</span></button
+                ><button
+                    class="tab-btn"
+                    data-tab="rules"
+                    id="nav-rules"
+                    role="tab"
+                    aria-controls="tab-rules"
+                    aria-selected="false"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"
+                        /></svg
+                    ><span>Cài đặt tương tác</span></button
+                ><button
+                    class="tab-btn"
+                    data-tab="testlab"
+                    id="nav-testlab"
+                    role="tab"
+                    aria-controls="tab-testlab"
+                    aria-selected="false"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="m9 3 6 0m-5 0v7L4 20h16l-6-10V3M8 14h8" /></svg
+                    ><span>Kiểm thử</span>
+                </button>
+            </div>
+            <div class="sidebar-footer">
+                <span class="studio-dot"></span> TikTok Live Studio<small
+                    >Không gian quản lý phiên LIVE</small
+                >
+            </div>
+        </aside>
+
+        <!-- ═══════════ APP ═══════════ -->
+        <div class="app-shell">
+            <!-- ── LIVE ── -->
+            <section
+                class="tab-panel active"
+                id="tab-live"
+                role="tabpanel"
+                aria-labelledby="nav-live"
+            >
+                <div class="page-header live-page-header">
+                    <h1 class="page-title">Kết nối LIVE</h1>
+                </div>
+
+                <div class="live-dashboard">
+                    <section
+                        class="card live-connection"
+                        aria-labelledby="live-account-title"
+                    >
+                        <div class="live-card-heading">
+                            <h2 class="card-title" id="live-account-title">
+                                Tài khoản TikTok
+                            </h2>
+                            <div class="live-status" role="status">
+                                <span
+                                    class="status-card-dot"
+                                    id="status-card-dot"
+                                    aria-hidden="true"
+                                ></span>
+                                <strong id="status-title-card"
+                                    >Đang kết nối máy chủ</strong
+                                >
+                            </div>
+                        </div>
+                        <p
+                            class="live-status-message"
+                            id="status-message"
+                            aria-live="polite"
+                        >
+                            Vui lòng chờ…
+                        </p>
+                        <label class="field-label" for="username"
+                            >Username đang LIVE</label
+                        >
+                        <div class="live-connect-actions">
+                            <input
+                                id="username"
+                                type="text"
+                                maxlength="25"
+                                placeholder="@username"
+                                autocomplete="off"
+                            />
+                            <button id="connect" class="btn btn-primary">
+                                Kết nối
+                            </button>
+                            <button id="disconnect" class="btn btn-secondary">
+                                Ngắt kết nối
+                            </button>
+                        </div>
+                    </section>
+
+                    <section
+                        class="card live-session"
+                        aria-labelledby="live-session-title"
+                    >
+                        <div class="live-card-heading">
+                            <h2 class="card-title" id="live-session-title">
+                                Thống kê phiên
+                            </h2>
+                            <button id="reset" class="btn btn-danger btn-sm">
+                                Đặt lại game
+                            </button>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <p class="stat-label">Sự kiện</p>
+                                <p class="stat-value" id="metric-events">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <p class="stat-label">Lượt vào</p>
+                                <p class="stat-value" id="metric-members">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <p class="stat-label">Bình luận</p>
+                                <p class="stat-value" id="metric-chats">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <p class="stat-label">Quà tặng</p>
+                                <p class="stat-value" id="metric-gifts">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <p class="stat-label">Kim cương</p>
+                                <p class="stat-value" id="metric-diamonds">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <p class="stat-label">Tim</p>
+                                <p class="stat-value" id="metric-likes">0</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section
+                class="tab-panel"
+                id="tab-assets"
+                role="tabpanel"
+                aria-labelledby="nav-assets"
+            >
+                <div class="page-header">
+                    <h1 class="page-title">Assets</h1>
+                </div>
+                <div
+                    class="asset-section-nav"
+                    role="group"
+                    aria-label="Danh mục Assets"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-asset-section="tab-visual-assets"
+                        aria-controls="tab-visual-assets"
+                        aria-pressed="true"
+                    >
+                        Nhân vật &amp; hiệu ứng
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-asset-section="tab-stage"
+                        aria-controls="tab-stage"
+                        aria-pressed="false"
+                    >
+                        Video màn DJ
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-asset-section="tab-background"
+                        aria-controls="tab-background"
+                        aria-pressed="false"
+                    >
+                        Phông nền
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-asset-section="tab-music"
+                        aria-controls="tab-music"
+                        aria-pressed="false"
+                    >
+                        Âm nhạc
+                    </button>
+                </div>
+                <section
+                    id="tab-visual-assets"
+                    aria-label="Nhân vật và hiệu ứng"
+                >
+                    <div class="card">
+                        <div class="asset-library-toolbar">
+                            <div
+                                class="asset-category-tabs"
+                                role="group"
+                                aria-label="Loại asset"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-asset-kind="character"
+                                    aria-pressed="true"
+                                >
+                                    Nhân vật
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-asset-kind="wing"
+                                    aria-pressed="false"
+                                >
+                                    Cánh
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-asset-kind="banner"
+                                    aria-pressed="false"
+                                >
+                                    Bảng hiệu
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-asset-kind="avatarFrame"
+                                    aria-pressed="false"
+                                >
+                                    Khung avatar
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                id="asset-upload"
+                                class="btn btn-primary"
+                                aria-describedby="asset-file-help"
+                            >
+                                + Thêm file
+                            </button>
+                            <input
+                                id="asset-file"
+                                type="file"
+                                accept=".gif,.webp,.png,.jpg,.jpeg"
+                                hidden
+                            />
+                        </div>
+                        <p id="asset-file-help" class="help">
+                            GIF, WebP, PNG hoặc JPG · Tối đa 20 MB
+                        </p>
+                        <div id="asset-banner-tools" hidden>
+                            <label class="field-label" for="asset-text"
+                                >Chữ hiển thị khi test</label
+                            >
+                            <div class="asset-library-toolbar">
+                                <input
+                                    type="text"
+                                    id="asset-text"
+                                    maxlength="40"
+                                    value="VIP SÀN NHẢY"
+                                />
+                                <button
+                                    type="button"
+                                    id="asset-test-text"
+                                    class="btn btn-secondary"
+                                >
+                                    Test chữ
+                                </button>
+                                <button
+                                    type="button"
+                                    id="asset-default-banner"
+                                    class="btn btn-secondary"
+                                >
+                                    Dùng bảng hiệu gốc
+                                </button>
+                            </div>
+                        </div>
+                        <p id="asset-message" class="help" role="status"></p>
+                        <div
+                            id="asset-gallery"
+                            class="background-gallery"
+                        ></div>
+                    </div>
+                </section>
+
+                <section id="tab-stage" hidden>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Màn hình sau DJ</h2>
+                            <button id="save-stage" class="btn btn-primary">
+                                Lưu &amp; áp dụng
+                            </button>
+                        </div>
+                        <div class="grid-2">
+                            <div>
+                                <label class="field-label" for="stage-mode"
+                                    >Chế độ hiển thị</label
+                                ><select id="stage-mode">
+                                    <option value="equalizer">
+                                        Sóng nhạc LED
+                                    </option>
+                                    <option value="video">Phát video</option>
+                                    <option value="off">Tắt màn hình</option>
+                                </select>
+                                <p class="help">
+                                    Video phát lặp và tắt tiếng, không ảnh hưởng
+                                    nhạc nền.
+                                </p>
+                                <div class="divider"></div>
+                                <label class="field-label" for="stage-video"
+                                    >Video của bạn</label
+                                ><select id="stage-video">
+                                    <option value="">
+                                        Chưa có video
+                                    </option></select
+                                ><button
+                                    id="add-stage-video"
+                                    class="btn btn-secondary"
+                                    style="margin-top: 12px"
+                                >
+                                    + Thêm video</button
+                                ><input
+                                    id="stage-video-file"
+                                    type="file"
+                                    accept=".mp4"
+                                    hidden
+                                />
+                                <p class="help">
+                                    MP4 (H.264), tối đa 100 MB. Khuyến nghị
+                                    video ngang 16:9, 720p hoặc 1080p.
+                                </p>
+                            </div>
+                            <div>
+                                <p class="field-label">Xem trước video</p>
+                                <video
+                                    id="stage-video-preview"
+                                    controls
+                                    muted
+                                    playsinline
+                                    preload="metadata"
+                                    style="
+                                        width: 100%;
+                                        max-height: 260px;
+                                        background: #101420;
+                                        border-radius: 8px;
+                                        margin-top: 10px;
+                                    "
+                                ></video>
+                                <p
+                                    id="stage-game-status"
+                                    class="help"
+                                    role="status"
+                                ></p>
+                            </div>
+                        </div>
+                        <p
+                            id="stage-message"
+                            class="help"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+                    </div>
+                </section>
+
+                <section id="tab-background" hidden>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-label">Không gian sàn nhảy</p>
+                                <h2 class="card-title">Ảnh nền của bạn</h2>
+                                <p class="help">
+                                    PNG hoặc JPG · Tối đa 20 MB. Ảnh sẽ phủ lên
+                                    căn phòng phía sau; nhân vật và đèn vẫn hiển
+                                    thị.
+                                </p>
+                            </div>
+                            <button id="add-background" class="btn btn-primary">
+                                + Thêm ảnh nền</button
+                            ><input
+                                id="background-file"
+                                type="file"
+                                accept=".png,.jpg,.jpeg"
+                                hidden
+                            />
+                        </div>
+                        <p
+                            id="background-message"
+                            class="help"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+                        <div
+                            id="background-gallery"
+                            class="background-gallery"
+                        ></div>
+                        <p class="help">
+                            Bấm “Dùng nền này” để áp dụng trong khoảng 2 giây.
+                            Chọn “Sân khấu 3D” để ẩn ảnh, hoặc “Nền mặc định” để
+                            trở về map ban đầu.
+                        </p>
+                    </div>
+                </section>
+
+                <section id="tab-music" hidden>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-label">Nhạc trong game</p>
+                                <h2 class="card-title">Cài đặt nhạc nền</h2>
+                            </div>
+                            <button id="save-music" class="btn btn-primary">
+                                Lưu cài đặt
+                            </button>
+                        </div>
+                        <div class="music-player-bar">
+                            <div>
+                                <strong id="music-now-playing"
+                                    >Đang kiểm tra game…</strong
+                                >
+                                <p class="help">
+                                    Chọn một bài bên dưới để phát trong game.
+                                </p>
+                            </div>
+                            <div class="card-actions">
+                                <button
+                                    id="pause-game-music"
+                                    class="btn btn-secondary"
+                                >
+                                    Tạm dừng</button
+                                ><button
+                                    id="resume-game-music"
+                                    class="btn btn-secondary"
+                                >
+                                    Tiếp tục</button
+                                ><button
+                                    id="next-game-music"
+                                    class="btn btn-secondary"
+                                >
+                                    Bài tiếp theo →
+                                </button>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="music-controls">
+                            <label class="toggle-wrap"
+                                ><input
+                                    id="music-enabled"
+                                    type="checkbox"
+                                    checked
+                                /><span class="toggle-track"></span>Bật nhạc
+                                nền</label
+                            ><label for="music-volume"
+                                >Âm lượng
+                                <strong id="music-volume-value"
+                                    >35%</strong
+                                ></label
+                            ><input
+                                id="music-volume"
+                                type="range"
+                                min="0"
+                                max="100"
+                                value="35"
+                                aria-label="Âm lượng nhạc nền"
+                            />
+                        </div>
+                        <p class="help">
+                            Game tự cập nhật sau khi lưu. Nhạc phát lần lượt
+                            theo tên file và lặp lại danh sách.
+                        </p>
+                        <div class="divider"></div>
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Danh sách nhạc</h2>
+                                <p class="help">
+                                    MP3, WAV hoặc OGG · Tối đa 50 MB mỗi file.
+                                </p>
+                            </div>
+                            <button id="add-music" class="btn btn-secondary">
+                                + Thêm nhạc</button
+                            ><input
+                                id="music-files"
+                                type="file"
+                                accept=".mp3,.wav,.ogg"
+                                multiple
+                                hidden
+                            />
+                        </div>
+                        <p
+                            id="music-message"
+                            class="help"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+                        <div
+                            id="music-track-list"
+                            class="music-track-list"
+                        ></div>
+                        <div class="divider"></div>
+                        <p class="help">
+                            Nghe thử trên trình duyệt độc lập với nhạc trong
+                            game. Dừng nghe thử trước khi lên LIVE để tránh phát
+                            trùng.
+                        </p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ── MASTER RULES ── -->
+            <section
+                class="tab-panel"
+                id="tab-rules"
+                role="tabpanel"
+                aria-labelledby="nav-rules"
+            >
+                <header class="interaction-header">
+                    <h1 class="page-title">Cài đặt tương tác</h1>
+                    <button
+                        id="save-master"
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        Lưu &amp; áp dụng
+                    </button>
+                </header>
+                <div class="interaction-settings">
+                    <label class="rule-field"
+                        ><span>Điều kiện vào sàn</span>
+                        <select id="join-mode">
+                            <option value="keyword_only">
+                                Dùng lệnh tham gia
+                            </option>
+                            <option value="all_interactions">
+                                Mọi tương tác
+                            </option>
+                        </select>
+                    </label>
+                    <label class="toggle-wrap">
+                        <input id="gift-always-joins" type="checkbox" checked />
+                        <span class="toggle-track"></span>
+                        Người tặng quà luôn được vào sàn
+                    </label>
+                </div>
+                <div id="master-message" class="master-msg" role="status"></div>
+                <div class="interaction-toolbar">
+                    <div
+                        class="interaction-sources"
+                        role="group"
+                        aria-label="Loại tương tác"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-rule-source="chat"
+                            aria-pressed="true"
+                        >
+                            Bình luận
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-rule-source="gift"
+                            aria-pressed="false"
+                        >
+                            Quà tặng
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-rule-source="like"
+                            aria-pressed="false"
+                        >
+                            Tim
+                        </button>
+                    </div>
+                    <div class="interaction-test-actor">
+                        <button
+                            id="spawn-test-actor"
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            + Thêm nhân vật test
+                        </button>
+                        <span id="test-actor-status" role="status"></span>
+                    </div>
+                </div>
+                <div class="interaction-workspace">
+                    <section
+                        class="interaction-list"
+                        aria-labelledby="interaction-list-title"
+                    >
+                        <header>
+                            <h2 id="interaction-list-title" class="card-title">
+                                Luật
+                            </h2>
+                            <button
+                                id="add-master-rule"
+                                type="button"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                + Thêm luật
+                            </button>
+                        </header>
+                        <input
+                            type="search"
+                            id="filter-master"
+                            aria-label="Tìm luật"
+                            placeholder="Tìm từ khóa, quà, ID…"
+                        />
+                        <button
+                            id="recent-gifts"
+                            type="button"
+                            class="btn btn-secondary"
+                            aria-haspopup="dialog"
+                            hidden
+                        >
+                            Thêm từ thư viện quà
+                        </button>
+                        <p
+                            id="gift-catalog-status"
+                            class="help"
+                            role="status"
+                            hidden
+                        ></p>
+                        <div
+                            id="master-index"
+                            class="interaction-index"
+                            role="group"
+                            aria-label="Danh sách luật"
+                        ></div>
+                        <p id="master-empty" class="help" hidden></p>
+                    </section>
+                    <section
+                        class="interaction-editor"
+                        aria-label="Trình sửa luật"
+                    >
+                        <div id="master-rules"></div>
+                        <p id="master-editor-empty" class="help">
+                            Chọn hoặc thêm luật.
+                        </p>
+                    </section>
+                </div>
+            </section>
+
+            <!-- ── TEST LAB ── -->
+            <section
+                class="tab-panel"
+                id="tab-testlab"
+                role="tabpanel"
+                aria-labelledby="nav-testlab"
+            >
+                <div class="page-header">
+                    <p class="page-eyebrow">Thử nghiệm</p>
+                    <h1 class="page-title">Kiểm thử</h1>
+                    <p class="page-desc">
+                        Thử các luật tương tác đã lưu với người xem giả.
+                    </p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-label">Demo Mode</p>
+                                <h2 class="card-title">Chạy phòng demo</h2>
+                            </div>
+                        </div>
+                        <p class="help" style="margin-bottom: 14px">
+                            Người xem tương tác độc lập theo luật đang bật, có
+                            gửi quà combo. Lưu cài đặt để cập nhật ngay.
+                        </p>
+                        <div class="demo-grid">
+                            <button
+                                data-demo-count="10"
+                                class="btn btn-secondary"
+                            >
+                                10 người
+                            </button>
+                            <button
+                                data-demo-count="30"
+                                class="btn btn-secondary"
+                            >
+                                30 người
+                            </button>
+                            <button
+                                data-demo-count="60"
+                                class="btn btn-secondary"
+                            >
+                                60 người
+                            </button>
+                            <button
+                                data-demo-count="400"
+                                class="btn btn-secondary"
+                            >
+                                400 người
+                            </button>
+                        </div>
+                        <div class="divider"></div>
+                        <button id="stop-demo" class="btn btn-danger btn-full">
+                            Dừng demo
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-label">Ghi chú</p>
+                                <h2 class="card-title">Cách hoạt động</h2>
+                            </div>
+                        </div>
+                        <div class="info-list">
+                            <p class="info-item">
+                                Demo tạo avatar ngẫu nhiên, phát sự kiện gift /
+                                chat / like liên tục.
+                            </p>
+                            <p class="info-item">
+                                Sự kiện đi qua đúng WebSocket pipeline — kết quả
+                                phản ánh chính xác hành vi production.
+                            </p>
+                            <p class="info-item">
+                                Bấm <strong>Dừng demo</strong> để xóa toàn bộ
+                                người dùng giả.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Thử nhanh</h2>
+                        </div>
+                        <div class="mini-inline">
+                            <label
+                                class="field-label"
+                                for="user-index"
+                                style="margin: 0; white-space: nowrap"
+                                >Dancer #</label
+                            >
+                            <input
+                                id="user-index"
+                                type="number"
+                                min="1"
+                                max="60"
+                                value="1"
+                                style="width: 70px"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="action-grid" style="margin-bottom: 16px">
+                        <button data-action="member" class="btn btn-secondary">
+                            👋 Vào sàn
+                        </button>
+                        <button
+                            data-action="like"
+                            data-value="50"
+                            class="btn btn-secondary"
+                        >
+                            ♥ Like ×50
+                        </button>
+                        <button data-action="follow" class="btn btn-secondary">
+                            💖 Follow
+                        </button>
+                        <button data-action="share" class="btn btn-secondary">
+                            📣 Share
+                        </button>
+                        <button data-action="dance" class="btn btn-secondary">
+                            🕺 Nhảy
+                        </button>
+                        <button data-action="jump" class="btn btn-secondary">
+                            ⬆️ Nhảy cao
+                        </button>
+                        <button data-action="walk" class="btn btn-secondary">
+                            🚶 Đi vòng
+                        </button>
+                        <button data-action="change" class="btn btn-secondary">
+                            🎭 Đổi nhân vật
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── FOOTER ── -->
+        </div>
+        <!-- end app-shell -->
+
+        <!-- ── Rule Template ── -->
+        <template id="master-rule-template">
+            <article class="master-rule-row" hidden>
+                <div class="rule-toolbar">
+                    <h2 class="card-title">Sửa luật</h2>
+                    <label class="toggle-wrap">
+                        <input data-field="enabled" type="checkbox" checked />
+                        <span class="toggle-track"></span>
+                        Bật luật
+                    </label>
+                    <div class="rule-col-actions">
+                        <button
+                            type="button"
+                            data-command="up"
+                            class="btn btn-secondary btn-sm"
+                            aria-label="Tăng ưu tiên"
+                            title="Tăng ưu tiên"
+                        >
+                            ↑
+                        </button>
+                        <button
+                            type="button"
+                            data-command="down"
+                            class="btn btn-secondary btn-sm"
+                            aria-label="Giảm ưu tiên"
+                            title="Giảm ưu tiên"
+                        >
+                            ↓
+                        </button>
+                        <button
+                            type="button"
+                            data-command="delete"
+                            class="btn btn-danger btn-sm"
+                        >
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+                <div class="rule-panels">
+                    <section class="rule-panel">
+                        <h3>Điều kiện</h3>
+                        <div class="rule-primary">
+                            <label class="rule-field" data-social-field
+                                ><span class="rule-field-label">Sự kiện</span>
+                                <select data-field="source">
+                                    <option value="gift">Quà tặng</option>
+                                    <option value="chat">Bình luận</option>
+                                    <option value="share">Chia sẻ</option>
+                                    <option value="like">Tim</option>
+                                </select>
+                            </label>
+                            <label class="rule-field" data-heart-field hidden
+                                ><span
+                                    class="rule-field-label"
+                                    data-heart-goal-label
+                                    >Mốc tim của cả phòng</span
+                                >
+                                <input
+                                    data-field="heartGoal"
+                                    type="number"
+                                    min="1"
+                                    max="100000000"
+                                    step="1"
+                                />
+                            </label>
+                            <label class="rule-field" data-chat-field
+                                ><span class="rule-field-label">Cách khớp</span>
+                                <select data-field="match">
+                                    <option value="exact">Chính xác</option>
+                                    <option value="contains">Có chứa</option>
+                                </select>
+                            </label>
+                            <div class="rule-field" data-gift-field>
+                                <span class="rule-field-label"
+                                    >Chọn quà TikTok</span
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-gift-picker
+                                    aria-label="Chọn quà TikTok"
+                                    aria-haspopup="dialog"
+                                >
+                                    Chọn từ thư viện quà
+                                </button>
+                                <img
+                                    data-gift-preview
+                                    width="42"
+                                    height="42"
+                                    alt=""
+                                    hidden
+                                />
+                            </div>
+                            <label class="rule-field" data-trigger-field
+                                ><span
+                                    class="rule-field-label"
+                                    data-trigger-label
+                                    >Điều kiện</span
+                                >
+                                <input
+                                    data-field="trigger"
+                                    maxlength="300"
+                                    placeholder="Phân cách bằng dấu phẩy"
+                                />
+                            </label>
+                            <input data-field="giftId" type="hidden" />
+                            <input data-field="displayDiamonds" type="hidden" />
+                        </div>
+                    </section>
+                    <section class="rule-panel">
+                        <h3>Hành động</h3>
+                        <div class="rule-primary">
+                            <label class="rule-field"
+                                ><span class="rule-field-label">Hành động</span>
+                                <select data-field="action">
+                                    <option value="join">Tham gia sàn</option>
+                                    <option value="dance">
+                                        Nhảy theo nhạc
+                                    </option>
+                                    <option value="jump">Nhảy bật lên</option>
+                                    <option value="camera">Zoom</option>
+                                    <option value="vip_dance">Quẩy VIP</option>
+                                    <option value="change">Đổi nhân vật</option>
+                                    <option value="wing">Đổi cánh</option>
+                                    <option value="avatar_frame">
+                                        Khung avatar
+                                    </option>
+                                    <option value="walk">Đi vòng</option>
+                                    <option value="grow">Phóng lớn</option>
+                                    <option value="medal">
+                                        Cánh và huy hiệu
+                                    </option>
+                                    <option value="vip_set">Bộ VIP</option>
+                                    <option value="topdj">
+                                        Top DJ và pháo hoa
+                                    </option>
+                                    <option value="fireworks">Pháo hoa</option>
+                                    <option value="party" data-heart-action>
+                                        Cả sàn cùng nhảy
+                                    </option>
+                                    <option value="orbit" data-heart-action>
+                                        Mở cổng không gian
+                                    </option>
+                                    <option value="level_up" data-heart-action>
+                                        Tăng cấp cá nhân
+                                    </option>
+                                </select>
+                            </label>
+                            <label class="rule-field" data-duration-field
+                                ><span class="rule-field-label"
+                                    >Thời lượng (giây)</span
+                                >
+                                <input
+                                    data-field="durationSeconds"
+                                    type="number"
+                                    min="0"
+                                    max="300"
+                                    step="0.001"
+                                />
+                            </label>
+                            <label class="rule-field" data-zoom-field hidden
+                                ><span class="rule-field-label"
+                                    >Thời gian zoom (giây)</span
+                                ><input
+                                    data-field="zoomSeconds"
+                                    type="number"
+                                    min="1"
+                                    max="12"
+                                    step="0.5"
+                                    value="3.5"
+                            /></label>
+                            <p
+                                class="help rule-field"
+                                data-orbit-duration-help
+                                hidden
+                            >
+                                Chỉ tính lúc bay. Nhập 0 để dùng 50 giây.
+                            </p>
+                            <label class="rule-field" data-title-field
+                                ><span class="rule-field-label"
+                                    >Chữ trên huy hiệu</span
+                                >
+                                <input data-field="label" maxlength="80" />
+                            </label>
+                            <label class="rule-field" data-title-field
+                                ><span class="rule-field-label"
+                                    >Kiểu cánh và huy hiệu</span
+                                >
+                                <select data-field="variant">
+                                    <option value="">Mặc định</option>
+                                    <option value="aura">Aura</option>
+                                    <option value="neon">Neon</option>
+                                    <option value="fire">Lửa</option>
+                                    <option value="royal">Hoàng gia</option>
+                                </select>
+                            </label>
+                            <label class="rule-field" data-firework-field
+                                ><span class="rule-field-label"
+                                    >Số đợt pháo hoa</span
+                                >
+                                <input
+                                    data-field="fireworkBursts"
+                                    type="number"
+                                    min="0"
+                                    max="12"
+                                />
+                            </label>
+                        </div>
+                    </section>
+                </div>
+                <div class="rule-test">
+                    <div class="gift-test-quantity" data-test-quantity hidden>
+                        <label
+                            >Số lượng quà test
+                            <input
+                                data-test-count
+                                type="number"
+                                min="1"
+                                max="100"
+                                step="1"
+                                value="1"
+                        /></label>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-test-preset="1"
+                        >
+                            ×1
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-test-preset="5"
+                        >
+                            ×5
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-test-preset="10"
+                        >
+                            ×10
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        data-command="test"
+                        class="btn btn-primary"
+                    >
+                        Test trong game
+                    </button>
+                    <p data-rule-test-result role="status"></p>
+                </div>
+            </article>
+        </template>
+
+        <dialog id="gift-library-dialog" aria-labelledby="gift-library-title">
+            <header class="gift-library-header">
+                <h2 id="gift-library-title">Chọn quà TikTok</h2>
+                <form method="dialog">
+                    <button class="btn btn-secondary" type="submit">
+                        Đóng
+                    </button>
+                </form>
+            </header>
+            <div class="gift-library-sync">
+                <p id="gift-library-status" role="status"></p>
+                <button
+                    id="refresh-gift-library"
+                    class="btn btn-secondary btn-sm"
+                    type="button"
+                >
+                    Tải quà từ LIVE
+                </button>
+            </div>
+            <div
+                id="gift-price-tabs"
+                role="group"
+                aria-label="Lọc theo số xu"
+            ></div>
+            <div id="gift-library-grid"></div>
+        </dialog>
+        <script src="control.js?v=vip-dance"></script>
+        <script src="music.js?v=2"></script>
+        <script src="backgrounds.js?v=2"></script>
+        <script src="stage.js?v=dj-video"></script>
+        <script src="open-game.js?v=2"></script>
+        <script src="asset-library.js?v=numbered-assets"></script>
+    </body>
+</html>

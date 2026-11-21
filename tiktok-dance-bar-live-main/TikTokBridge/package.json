@@ -1,0 +1,25 @@
+{
+    "name": "tiktoklivegame",
+    "version": "1.0.0",
+    "private": true,
+    "description": "TikTok Live Game 3D Bridge",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "check": "node scripts/check-source.js",
+        "download:gifs": "node scripts/download-mushroom-gifs.js",
+        "security:smoke": "node scripts/security-smoke.js",
+        "test": "npm run check && node --test"
+    },
+    "keywords": [],
+    "license": "UNLICENSED",
+    "engines": {
+        "node": ">=20"
+    },
+    "type": "commonjs",
+    "dependencies": {
+        "express": "^5.2.1",
+        "tiktok-live-connector": "^2.4.3",
+        "ws": "^8.21.1"
+    }
+}

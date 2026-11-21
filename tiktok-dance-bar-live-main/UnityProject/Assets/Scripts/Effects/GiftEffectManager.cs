@@ -1,0 +1,307 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace TikTokLiveGame
+{
+    public sealed class GiftEffectManager : MonoBehaviour
+    {
+        private sealed class GiftPresentation
+        {
+            public TikTokEvent Gift;
+            public PlayerActor Actor;
+            public int Quantity;
+            public int Combo;
+        }
+        private readonly Queue<GiftPresentation> presentations = new();
+        private readonly Dictionary<(string User, string Gift), GiftPresentation> pending = new();
+        private (string User, string Gift) currentGift;
+        private float nextPresentationAt;
+        internal bool HasGiftPresentation => presentations.Count > 0 || Time.unscaledTime < nextPresentationAt;
+        private AudioSource fireworkAudio;
+        private AudioClip fireworkClip;
+        internal string BannerSender { get; private set; }
+        internal string BannerGift { get; private set; }
+        internal int BannerQuantity { get; private set; }
+        internal PlayerActor BannerActor { get; private set; }
+        internal float BannerStarted { get; private set; }
+        internal float BannerUntil { get; private set; }
+        internal float ComboStarted { get; private set; }
+        internal float ComboUntil { get; private set; }
+        internal int ComboCount { get; private set; }
+        internal PlayerActor ComboActor { get; private set; }
+
+        private void Awake()
+        {
+            fireworkAudio = gameObject.AddComponent<AudioSource>();
+            fireworkAudio.playOnAwake = false;
+            fireworkAudio.loop = false;
+            fireworkAudio.spatialBlend = 0.08f;
+            fireworkAudio.volume = 0.72f;
+            fireworkAudio.priority = 80;
+            fireworkClip = Resources.Load<AudioClip>("Audio/dragon-studio-fireworks-07-419025");
+            fireworkAudio.clip = fireworkClip;
+        }
+
+        public void Play(TikTokEvent data, PlayerActor actor)
+        {
+            if (data.type != "gift")
+            {
+                if (data.action is "fireworks" or "topdj") LaunchRuleFireworks(data);
+                return;
+            }
+            var key = (data.userId ?? "", data.giftId ?? data.giftName ?? "");
+            if (Time.unscaledTime < BannerUntil && key == currentGift)
+            {
+                BannerQuantity += Mathf.Max(1, data.repeatCount);
+                BannerUntil = Mathf.Min(BannerStarted + 5f, Mathf.Max(BannerUntil, Time.unscaledTime + 1f));
+                if (ComboCount < 2) ComboStarted = Time.unscaledTime;
+                ComboCount = Mathf.Max(ComboCount, data.comboCount, BannerQuantity);
+                if (ComboCount >= 2)
+                {
+                    ComboActor = actor;
+                    ComboUntil = BannerUntil;
+                }
+                nextPresentationAt = BannerUntil + 1.2f;
+                return;
+            }
+            if (pending.TryGetValue(key, out GiftPresentation existing))
+            {
+                existing.Quantity += Mathf.Max(1, data.repeatCount);
+                existing.Combo = Mathf.Max(existing.Combo, data.comboCount);
+                return;
+            }
+            GiftPresentation presentation = new()
+            {
+                Gift = data, Actor = actor, Quantity = Mathf.Max(1, data.repeatCount), Combo = data.comboCount
+            };
+            pending[key] = presentation;
+            presentations.Enqueue(presentation);
+        }
+
+        private void Update()
+        {
+            if (Time.unscaledTime < nextPresentationAt || presentations.Count == 0) return;
+            GiftPresentation presentation = presentations.Dequeue();
+            TikTokEvent data = presentation.Gift;
+            PlayerActor actor = presentation.Actor;
+            currentGift = (data.userId ?? "", data.giftId ?? data.giftName ?? "");
+            pending.Remove(currentGift);
+            BannerSender = string.IsNullOrWhiteSpace(data.nickname) ? "Khách LIVE" : data.nickname;
+            BannerGift = string.IsNullOrWhiteSpace(data.giftName) ? "Gift" : data.giftName;
+            BannerQuantity = presentation.Quantity;
+            BannerActor = actor;
+            BannerStarted = Time.unscaledTime;
+            BannerUntil = BannerStarted + 3.5f;
+            nextPresentationAt = BannerUntil + 1.2f;
+            ComboCount = Mathf.Max(presentation.Combo, presentation.Quantity);
+            if (ComboCount >= 2)
+            {
+                ComboStarted = BannerStarted;
+                ComboActor = actor;
+                ComboUntil = BannerUntil;
+            }
+            bool spotlight = data.action is "camera" or "vip" or "topdj" or "fireworks" or "medal";
+            if (actor != null && spotlight && data.diamondCount >= 20) StartCoroutine(Spotlight(actor, data));
+            if (data.action is "fireworks" or "topdj") LaunchRuleFireworks(data);
+        }
+
+        internal void ResetPresentations()
+        {
+            presentations.Clear();
+            pending.Clear();
+            BannerUntil = ComboUntil = nextPresentationAt = 0f;
+        }
+
+        internal void LaunchRuleFireworks(TikTokEvent data)
+        {
+            LaunchFireworks(data.fireworkBursts > 0 ? Mathf.Clamp(data.fireworkBursts, 1, 12) : 4);
+        }
+
+        public void PartyBurst()
+        {
+            BannerSender = null;
+            BannerActor = null;
+            BannerStarted = Time.unscaledTime;
+            BannerUntil = BannerStarted + 6f;
+            LaunchFireworks(5);
+        }
+
+        private IEnumerator Spotlight(PlayerActor actor, TikTokEvent data)
+        {
+            GameObject lightObject = new($"Gift Spotlight — {actor.Nickname}");
+            Light light = lightObject.AddComponent<Light>();
+            light.type = LightType.Spot;
+            light.color = data.diamondCount >= 100 ? new Color(1f, 0.22f, 0.68f) : new Color(0.2f, 0.9f, 1f);
+            light.intensity = data.diamondCount >= 100 ? 35f : 22f;
+            light.range = 14f;
+            light.spotAngle = 38f;
+
+            float duration = Mathf.Clamp(data.durationMs / 1000f, 3f, 12f);
+            float end = Time.time + duration;
+            while (actor != null && Time.time < end)
+            {
+                lightObject.transform.position = actor.transform.position + new Vector3(0f, 7f, 2f);
+                lightObject.transform.LookAt(actor.transform.position + Vector3.up);
+                yield return null;
+            }
+            Destroy(lightObject);
+        }
+
+        private void LaunchFireworks(int burstCount)
+        {
+            PlayFireworkSound();
+            StartCoroutine(FireworkSequence(burstCount));
+            StartCoroutine(ColdFountainSequence());
+        }
+
+        private IEnumerator FireworkSequence(int waveCount)
+        {
+            for (int wave = 0; wave < waveCount; wave++)
+            {
+                int burstInWave = wave % 3 == 0 ? 2 : 1;
+                for (int index = 0; index < burstInWave; index++)
+                {
+                    Vector3 position = new(Random.Range(-6.5f, 6.5f), Random.Range(4f, 8.2f), Random.Range(-7f, -0.5f));
+                    CreateBurst(position, Color.HSVToRGB(Random.value, 0.78f, 1f));
+                }
+                yield return new WaitForSeconds(0.72f);
+            }
+        }
+
+        private IEnumerator ColdFountainSequence()
+        {
+            float[] xPositions = { -5.35f, -3.45f, -1.55f, 1.55f, 3.45f, 5.35f };
+            int[,] pairs = { { 0, 5 }, { 1, 4 }, { 2, 3 } };
+            for (int pair = 0; pair < 3; pair++)
+            {
+                float duration = 5.35f - pair * 0.32f;
+                CreateColdFountain(new Vector3(xPositions[pairs[pair, 0]], 0.08f, -4.75f), duration, false);
+                CreateColdFountain(new Vector3(xPositions[pairs[pair, 1]], 0.08f, -4.75f), duration, false);
+                yield return new WaitForSeconds(0.32f);
+            }
+
+            yield return new WaitForSeconds(2.15f);
+            foreach (float x in xPositions)
+                CreateColdFountain(new Vector3(x, 0.08f, -4.75f), 2.35f, true);
+        }
+
+        private void CreateColdFountain(Vector3 position, float duration, bool finale)
+        {
+            GameObject fountain = new(finale ? "Cold Spark Finale" : "Cold Spark Fountain");
+            fountain.transform.position = position;
+            fountain.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+            ParticleSystem particles = fountain.AddComponent<ParticleSystem>();
+
+            ParticleSystem.MainModule main = particles.main;
+            main.duration = duration;
+            main.loop = false;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.62f, 1.02f);
+            main.startSpeed = finale
+                ? new ParticleSystem.MinMaxCurve(6.2f, 9.1f)
+                : new ParticleSystem.MinMaxCurve(4.8f, 7.5f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.018f, 0.043f);
+            main.startColor = new ParticleSystem.MinMaxGradient(
+                new Color(1f, 0.94f, 0.66f, 1f),
+                Color.white);
+            main.gravityModifier = 0.38f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.playOnAwake = false;
+
+            ParticleSystem.EmissionModule emission = particles.emission;
+            emission.rateOverTime = finale ? 108f : 72f;
+
+            ParticleSystem.ShapeModule shape = particles.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = finale ? 8.5f : 6.2f;
+            shape.radius = 0.055f;
+
+            ParticleSystem.NoiseModule noise = particles.noise;
+            noise.enabled = true;
+            noise.strength = finale ? 0.42f : 0.28f;
+            noise.frequency = 1.35f;
+            noise.scrollSpeed = 0.7f;
+
+            ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            Gradient gradient = new();
+            gradient.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(Color.white, 0f),
+                    new GradientColorKey(new Color(1f, 0.78f, 0.28f), 0.62f),
+                    new GradientColorKey(new Color(1f, 0.38f, 0.08f), 1f)
+                },
+                new[]
+                {
+                    new GradientAlphaKey(0f, 0f),
+                    new GradientAlphaKey(1f, 0.06f),
+                    new GradientAlphaKey(0.92f, 0.72f),
+                    new GradientAlphaKey(0f, 1f)
+                });
+            colorOverLifetime.color = gradient;
+
+            ParticleSystemRenderer renderer = particles.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = GameMaterials.BackgroundSprite();
+            renderer.renderMode = ParticleSystemRenderMode.Stretch;
+            renderer.velocityScale = 0.085f;
+            renderer.lengthScale = 1.35f;
+            renderer.maxParticleSize = 0.055f;
+
+            particles.Play();
+            Destroy(fountain, duration + 1.5f);
+        }
+
+        private void CreateBurst(Vector3 position, Color color)
+        {
+            GameObject burst = new("Firework Burst");
+            burst.transform.position = position;
+            ParticleSystem particles = burst.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = particles.main;
+            main.duration = 1f;
+            main.loop = false;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.48f, 0.86f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(2.2f, 4.1f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.016f, 0.042f);
+            main.startColor = new ParticleSystem.MinMaxGradient(color, Color.white);
+            main.gravityModifier = 0.28f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.playOnAwake = false;
+
+            ParticleSystem.EmissionModule emission = particles.emission;
+            emission.enabled = false;
+            ParticleSystem.ShapeModule shape = particles.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.12f;
+
+            ParticleSystem.LimitVelocityOverLifetimeModule limit = particles.limitVelocityOverLifetime;
+            limit.enabled = true;
+            limit.drag = 0.22f;
+
+            ParticleSystem.TrailModule trails = particles.trails;
+            trails.enabled = true;
+            trails.ratio = 0.06f;
+            trails.lifetime = new ParticleSystem.MinMaxCurve(0.04f, 0.08f);
+
+            ParticleSystemRenderer renderer = particles.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = GameMaterials.BackgroundSprite();
+            renderer.trailMaterial = GameMaterials.BackgroundSprite();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.maxParticleSize = 0.035f;
+
+            particles.Play();
+            particles.Emit(new ParticleSystem.EmitParams(), 28);
+            Destroy(burst, 1.8f);
+        }
+
+        private void PlayFireworkSound()
+        {
+            if (fireworkAudio == null || fireworkClip == null) return;
+            fireworkAudio.Stop();
+            fireworkAudio.Play();
+        }
+
+    }
+}
